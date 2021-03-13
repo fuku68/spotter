@@ -20,19 +20,14 @@ def send_select_instance() -> None:
             "attachment_type": "default",
             "actions": [
                  {
-                    "name": "games_list",
-                    "text": "Pick a game...",
+                    "name": "selected",
+                    "text": "select instance type...",
                     "type": "select",
                     "options": list(instance_options),
                 },
                 {
-                    "name": "ok",
-                    "text": "OK",
-                    "type": "button",
-                    "value": "ok"
-                },
-                {
                     "name": "cancel",
+                    "style": "danger",
                     "text": "CANCEL",
                     "type": "button",
                     "value": "cancel"
