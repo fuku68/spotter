@@ -5,7 +5,8 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 import json
 
-from src.slackbot import send
+from src.slackbot import sender
+from src.aws import ec2
 
 
 router = APIRouter()
@@ -22,13 +23,13 @@ async def send_msg(request: Request) -> Any:
         resp = { 'challenge': data['challenge'] }
         return JSONResponse(content=jsonable_encoder(resp))
 
-    print(data)
     if 'event' in data:
         event = data['event']
         if event['type'] == 'app_mention':
             if 'list' in event['text']:
-                pass
-            #  send.send_select_instance()
+                sender.send_instance_list()
+            elif 'deploy' in event['text']:
+                sender.send_select_instance()
 
 
 @router.post("/post")
@@ -42,8 +43,24 @@ async def post(payload: str = Form(...)) -> Any:
                 "delete_original": "true"
             }
             return JSONResponse(content=jsonable_encoder(resp))
-        if (data['actions'][0]['name'] == 'selected'):
-            instance_type = data['actions'][0]['selected_options'][0]['value']
-            print(instance_type)
 
-        raise HTTPException(status_code=404, detail="Item not found")
+        if (data['actions'][0]['name'] == 'selected'):
+            user = data['user']['name']
+            instance_type = data['actions'][0]['selected_options'][0]['value']
+            try:
+                instance = ec2.create_spot_instance(instance_type=instance_type, user=user)
+                attachment = sender.create_spot_instance_attachment(instance)
+                resp = {
+                    "replace_original": "true",
+                    "attachments": [attachment],
+                }
+                return JSONResponse(content=jsonable_encoder(resp))
+
+            except Exception as e:
+                resp = {
+                    "replace_original": "true",
+                    "text": "ERROR: " + e,
+                }
+                return JSONResponse(content=jsonable_encoder(resp))
+
+    raise HTTPException(status_code=404, detail="Item not found")

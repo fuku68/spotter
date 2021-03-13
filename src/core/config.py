@@ -4,6 +4,10 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     SLACK_TOKEN: str
+    # aws
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
+    REGION_NAME: str
 
     class Config:
         env_file = join(dirname(__file__), "../../.env")
