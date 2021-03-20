@@ -3,6 +3,7 @@ from typing import Any
 from fastapi import APIRouter, Request, Form, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+import re
 import json
 
 from src.slackbot import sender
@@ -31,7 +32,9 @@ async def send_msg(request: Request) -> Any:
             elif 'deploy' in event['text']:
                 sender.send_select_instance()
             elif 'drop' in event['text']:
-                pass
+                r = re.search(r'drop\s+(\S+)', event['text'].strip())
+                if r and r.group(1):
+                    sender.send_drop_instance(r.group(1))
 
 
 @router.post("/post")

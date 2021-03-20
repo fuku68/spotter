@@ -13,11 +13,12 @@ def send_error(err) -> None:
 def send_instance_list() -> None:
     client = WebClient(settings.SLACK_TOKEN)
     requests = ec2.spot_request_list()
+    instances = ec2.list()
 
     attachments = []
-    for instance in requests:
-        print(instance)
-        attachment = create_spot_instance_attachment(instance)
+    for spot_request in requests:
+        instance = next(filter(lambda x: x['InstanceId'] == spot_request['InstanceId'], instances), None)
+        attachment = create_spot_instance_attachment(spot_request, instance)
         attachments.append(attachment)
 
     response = client.chat_postMessage(
@@ -26,32 +27,36 @@ def send_instance_list() -> None:
        attachments=attachments)
 
 
-def create_spot_instance_attachment(instance):
-  specification = instance['LaunchSpecification']
-  tags = instance['Tags']
+def create_spot_instance_attachment(spot, instance = {}):
+  specification = spot['LaunchSpecification'] if 'LaunchSpecification' in spot.keys() else {}
+  tags = spot['Tags']
   created_by = ''
   for tag in tags:
       if tag['Key'] == 'created_by':
           created_by = tag['Value']
 
   attachment = {
-      'title': instance['InstanceId'],
-      'color': 'good' if instance['State'] == 'active' else '#FF0000',
+      'title': spot['InstanceId'],
+      'color': 'good' if spot['State'] == 'active' else '#FF0000',
       "fields": [{
           "title": "InstanceType",
-          "value": specification['InstanceType'],
+          "value": specification['InstanceType']  if 'InstanceType' in specification.keys() else '',
           "short": "true"
       }, {
           "title": "SpotPrice",
-          "value": instance['SpotPrice'],
+          "value": spot['SpotPrice'],
           "short": "true"
       }, {
           "title": "State",
-          "value": instance['State'],
+          "value": spot['State'],
+          "short": "true"
+      }, {
+          "title": "IP",
+          "value": instance['PublicIpAddress'] if 'PublicIpAddress' in instance.keys() else '',
           "short": "true"
       }, {
           "title": "CreatedAt",
-          "value": instance['CreateTime'].strftime("%Y/%m/%d %H:%M"),
+          "value": spot['CreateTime'].strftime("%Y/%m/%d %H:%M"),
           "short": "true"
       }, {
           "title": "CreatedBy",
@@ -90,8 +95,16 @@ def send_select_instance() -> None:
             ]
         }
     ]
-
-    esponse = client.chat_postMessage(
+    response = client.chat_postMessage(
        channel='#sandbox',
        text="DEPLOY INSTANCE!",
        attachments=attachments)
+
+
+def send_drop_instance(instance_id):
+    drop_id = ec2.terminate_instance(instance_id)
+
+    client = WebClient(settings.SLACK_TOKEN)
+    response = client.chat_postMessage(
+       channel='#sandbox',
+       text="DROP INSTANCE: " + drop_id)

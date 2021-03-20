@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     AWS_SECRET_ACCESS_KEY: str
     REGION_NAME: str
 
+    AMI_ID: str
+    SECURITY_GROUP_ID: str
+
     class Config:
         env_file = join(dirname(__file__), "../../.env")
         env_file_encoding = "utf-8"
