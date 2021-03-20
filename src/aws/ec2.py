@@ -45,10 +45,19 @@ def create_spot_instance(instance_type: str, user: str = ''):
     print(request)
 
 
+def terminate_instance(instance_id: str):
+    client = boto3.client('ec2',  aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                          aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                          region_name=settings.REGION_NAME)
+    client.terminate_instances(
+        InstanceIds=[instance_id]
+    )
+
+
 def cancel_spot_instance(spot_request_id: str):
     client = boto3.client('ec2',  aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                           aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
                           region_name=settings.REGION_NAME)
     client.cancel_spot_instance_requests(
-            SpotInstanceRequestIds=[spot_request_id]
+        SpotInstanceRequestIds=[spot_request_id]
     )
