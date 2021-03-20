@@ -30,6 +30,8 @@ async def send_msg(request: Request) -> Any:
                 sender.send_instance_list()
             elif 'deploy' in event['text']:
                 sender.send_select_instance()
+            elif 'drop' in event['text']:
+                pass
 
 
 @router.post("/post")

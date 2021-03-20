@@ -42,7 +42,7 @@ def create_spot_instance(instance_type: str, user: str = ''):
         }],
         # DryRun=False
     )
-    print(request)
+    return request
 
 
 def terminate_instance(instance_id: str):
