@@ -34,7 +34,7 @@ async def send_msg(request: Request) -> Any:
             elif 'drop' in event['text']:
                 r = re.search(r'drop\s+(\S+)', event['text'].strip())
                 if r and r.group(1):
-                    sender.senf_drop_instance(r.group(1))
+                    sender.send_drop_instance(r.group(1))
 
 
 @router.post("/post")

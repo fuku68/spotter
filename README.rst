@@ -1,5 +1,5 @@
 ## run server
 
 ```
-poetry run uvicorn src.main:app
+poetry run uvicorn --host 0.0.0.0 src.main:app
 ```

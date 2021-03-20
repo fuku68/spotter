@@ -17,8 +17,9 @@ def send_instance_list() -> None:
 
     attachments = []
     for spot_request in requests:
-        instance = next(filter(lambda x: x['InstanceId'] == spot_request['InstanceId'], instances), None)
-        attachment = create_spot_instance_attachment(spot_request, instance)
+        instance = next(filter(lambda x: x['Instances'][0]['InstanceId'] == spot_request['InstanceId'], instances), None)
+        instance = instance['Instances'][0] if instance else {}
+        attachment = create_spot_instance_attachment(spot=spot_request, instance=instance)
         attachments.append(attachment)
 
     response = client.chat_postMessage(
@@ -28,7 +29,7 @@ def send_instance_list() -> None:
 
 
 def create_spot_instance_attachment(spot, instance = {}):
-  specification = spot['LaunchSpecification']
+  specification = spot['LaunchSpecification'] if 'LaunchSpecification' in spot.keys() else {}
   tags = spot['Tags']
   created_by = ''
   for tag in tags:
@@ -40,7 +41,7 @@ def create_spot_instance_attachment(spot, instance = {}):
       'color': 'good' if spot['State'] == 'active' else '#FF0000',
       "fields": [{
           "title": "InstanceType",
-          "value": specification['InstanceType'],
+          "value": specification['InstanceType']  if 'InstanceType' in specification.keys() else '',
           "short": "true"
       }, {
           "title": "SpotPrice",
@@ -52,7 +53,7 @@ def create_spot_instance_attachment(spot, instance = {}):
           "short": "true"
       }, {
           "title": "IP",
-          "value": instance['PublicIpAddress'],
+          "value": instance['PublicIpAddress'] if instance and 'PublicIpAddress' in instance.keys() else '',
           "short": "true"
       }, {
           "title": "CreatedAt",
@@ -103,6 +104,8 @@ def send_select_instance() -> None:
 
 def send_drop_instance(instance_id):
     drop_id = ec2.terminate_instance(instance_id)
+
+    client = WebClient(settings.SLACK_TOKEN)
     response = client.chat_postMessage(
        channel='#sandbox',
        text="DROP INSTANCE: " + drop_id)

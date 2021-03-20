@@ -11,7 +11,7 @@ def list():
                                   'Name': 'image-id',
                                   'Values': [settings.AMI_ID]}])
 
-    instances = resp['Reservations'][0]['Instances']
+    instances = resp['Reservations']
     return instances
 
 
