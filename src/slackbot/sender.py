@@ -23,7 +23,7 @@ def send_instance_list() -> None:
         attachments.append(attachment)
 
     response = client.chat_postMessage(
-       channel='#sandbox',
+       channel=settings.SLACK_CHANNEL
        text="INSTANCE LIST",
        attachments=attachments)
 
@@ -97,7 +97,7 @@ def send_select_instance() -> None:
         }
     ]
     response = client.chat_postMessage(
-       channel='#sandbox',
+       channel=settings.SLACK_CHANNEL
        text="DEPLOY INSTANCE!",
        attachments=attachments)
 
@@ -107,5 +107,5 @@ def send_drop_instance(instance_id):
 
     client = WebClient(settings.SLACK_TOKEN)
     response = client.chat_postMessage(
-       channel='#sandbox',
+       channel=settings.SLACK_CHANNEL
        text="DROP INSTANCE: " + drop_id)

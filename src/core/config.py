@@ -3,7 +3,9 @@ from os.path import dirname, join
 from pydantic import BaseSettings
 
 class Settings(BaseSettings):
+    # slack
     SLACK_TOKEN: str
+    SLACK_CHANNEL: str
     # aws
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str
