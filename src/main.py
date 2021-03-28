@@ -14,4 +14,4 @@ async def exception_handler(request: Request, exc: Exception) -> Any:
     return JSONResponse(status_code=500, content={"detail": error_message})
 
 
-app.include_router(api_router, prefix="/api")
+app.include_router(api_router, prefix="/bot")
