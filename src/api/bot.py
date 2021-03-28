@@ -64,7 +64,7 @@ async def post(payload: str = Form(...)) -> Any:
             except Exception as e:
                 resp = {
                     "replace_original": "true",
-                    "text": "ERROR: " + e,
+                    "text": "ERROR: " + str(e),
                 }
                 return JSONResponse(content=jsonable_encoder(resp))
 

@@ -22,10 +22,14 @@ def spot_request_list():
     request = client.describe_spot_instance_requests(Filters=[{
                                                      'Name': 'state',
                                                      'Values': ['open', 'active']}])
+    print(request)
     return request['SpotInstanceRequests']
 
 
 def create_spot_instance(instance_type: str, user: str = ''):
+    print("create_spot_instance")
+    print("AMI: " + settings.AMI_ID)
+    print("SG : " + settings.SECURITY_GROUP_ID)
     client = boto3.client('ec2',  aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                           aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
                           region_name=settings.REGION_NAME)
@@ -33,8 +37,14 @@ def create_spot_instance(instance_type: str, user: str = ''):
         # SpotPrice="0.03",
         InstanceCount=1,
         LaunchSpecification={
-            "ImageId": 'ami-03a4d325b17d64671',
+            "ImageId": settings.AMI_ID,
             "InstanceType": instance_type,
+            "SecurityGroupIds": [
+                settings.SECURITY_GROUP_ID,
+            ],
+            "Placement": {
+                "AvailabilityZone": settings.AVAILABILITY_ZONE,
+            },
         },
         TagSpecifications=[{
             "ResourceType": "spot-instances-request",
@@ -45,7 +55,6 @@ def create_spot_instance(instance_type: str, user: str = ''):
                 },
             ],
         }],
-        # DryRun=False
     )
     return request
 
