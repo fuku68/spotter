@@ -30,14 +30,15 @@ def send_instance_list() -> None:
 
 def create_spot_instance_attachment(spot, instance = {}):
   specification = spot['LaunchSpecification'] if 'LaunchSpecification' in spot.keys() else {}
-  tags = spot['Tags']
   created_by = ''
-  for tag in tags:
-      if tag['Key'] == 'created_by':
-          created_by = tag['Value']
+  if 'Tags' in spot.keys():
+    tags = spot['Tags']
+    for tag in tags:
+        if tag['Key'] == 'created_by':
+            created_by = tag['Value']
 
   attachment = {
-      'title': spot['InstanceId'],
+      'title': spot['InstanceId']  if 'InstanceId' in spot.keys() else 'CREATING',
       'color': 'good' if spot['State'] == 'active' else '#FF0000',
       "fields": [{
           "title": "InstanceType",

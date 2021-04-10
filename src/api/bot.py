@@ -54,7 +54,7 @@ async def post(payload: str = Form(...)) -> Any:
             instance_type = data['actions'][0]['selected_options'][0]['value']
             try:
                 instance = ec2.create_spot_instance(instance_type=instance_type, user=user)
-                attachment = sender.create_spot_instance_attachment(instance)
+                attachment = sender.create_spot_instance_attachment(instance['SpotInstanceRequests'][0])
                 resp = {
                     "replace_original": "true",
                     "attachments": [attachment],
