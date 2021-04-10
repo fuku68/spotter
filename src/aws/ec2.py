@@ -21,7 +21,7 @@ def spot_request_list():
                           region_name=settings.REGION_NAME)
     request = client.describe_spot_instance_requests(Filters=[{
                                                      'Name': 'state',
-                                                     'Values': ['open', 'active']}])
+                                                     'Values': ['open', 'active', 'closed', 'failed']}])
     print(request)
     return request['SpotInstanceRequests']
 
