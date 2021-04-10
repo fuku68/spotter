@@ -17,7 +17,9 @@ def send_instance_list() -> None:
 
     attachments = []
     for spot_request in requests:
-        instance = next(filter(lambda x: x['Instances'][0]['InstanceId'] == spot_request['InstanceId'], instances), None)
+        instance = None
+        if 'InstanceId' in spot_request.keys():
+            instance = next(filter(lambda x: x['Instances'][0]['InstanceId'] == spot_request['InstanceId'], instances), None)
         instance = instance['Instances'][0] if instance else {}
         attachment = create_spot_instance_attachment(spot=spot_request, instance=instance)
         attachments.append(attachment)
